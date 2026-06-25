@@ -3,32 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Help.Debs | Dice Room</title>
+  <title>Help.Debs | Live Wheel</title>
 
-  <!-- Supabase JS v2 via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
       --bg: #fff7fb;
-      --panel: rgba(255, 255, 255, 0.84);
-      --panel-strong: #ffffff;
+      --panel: rgba(255, 255, 255, 0.9);
       --text: #251726;
-      --muted: #715f73;
+      --muted: #756279;
       --brand: #9b5de5;
-      --brand-2: #f15bb5;
-      --brand-3: #fee440;
+      --brand2: #f15bb5;
+      --brand3: #00bbf9;
+      --line: rgba(37, 23, 38, 0.12);
+      --shadow: 0 20px 55px rgba(75, 38, 95, 0.16);
       --good: #2e9d62;
       --bad: #c2415d;
-      --line: rgba(37, 23, 38, 0.12);
-      --shadow: 0 18px 50px rgba(75, 38, 95, 0.16);
       --radius: 26px;
-      --dice-size: 118px;
+      --wheel-size: min(470px, 76vw);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html, body {
       margin: 0;
@@ -36,47 +32,61 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at top left, rgba(241, 91, 181, 0.24), transparent 36%),
-        radial-gradient(circle at top right, rgba(155, 93, 229, 0.22), transparent 34%),
+        radial-gradient(circle at top left, rgba(241, 91, 181, .22), transparent 36%),
+        radial-gradient(circle at top right, rgba(155, 93, 229, .2), transparent 34%),
         linear-gradient(135deg, #fff7fb 0%, #f8f1ff 100%);
     }
 
     body {
       min-height: 100vh;
-      padding: 26px;
+      padding: 24px;
       display: flex;
       justify-content: center;
-      align-items: stretch;
     }
 
-    button, input, select {
-      font: inherit;
-    }
+    button, input, textarea, select { font: inherit; }
 
     button {
       border: 0;
       cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+      transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
     }
 
-    button:hover {
-      transform: translateY(-1px);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
     button:disabled {
-      opacity: 0.45;
+      opacity: .46;
       cursor: not-allowed;
       transform: none;
     }
 
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 15px;
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+      line-height: 1.35;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(155, 93, 229, .58);
+      box-shadow: 0 0 0 4px rgba(155, 93, 229, .11);
+    }
+
+    h1, h2, p { margin: 0; }
+
     .app {
-      width: min(1180px, 100%);
+      width: min(1220px, 100%);
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 360px 1fr;
       gap: 18px;
     }
 
@@ -94,12 +104,12 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      min-height: calc(100vh - 52px);
+      min-height: calc(100vh - 48px);
     }
 
     .main {
       padding: 20px;
-      min-height: calc(100vh - 52px);
+      min-height: calc(100vh - 48px);
       display: flex;
       flex-direction: column;
       gap: 18px;
@@ -110,51 +120,52 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 6px 4px 12px;
+      padding: 6px 4px 10px;
     }
 
     .logo {
       width: 46px;
       height: 46px;
       border-radius: 16px;
-      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
       display: grid;
       place-items: center;
       color: white;
-      font-weight: 900;
+      font-weight: 950;
       letter-spacing: -1px;
-      box-shadow: 0 12px 30px rgba(155, 93, 229, 0.28);
-    }
-
-    h1, h2, h3, p {
-      margin: 0;
+      box-shadow: 0 12px 30px rgba(155, 93, 229, .28);
     }
 
     h1 {
       font-size: 1.16rem;
-      letter-spacing: -0.03em;
+      letter-spacing: -.03em;
       line-height: 1.05;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      letter-spacing: -.045em;
     }
 
     .subtitle {
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: .9rem;
       margin-top: 4px;
     }
 
     .section {
       padding: 14px;
-      background: rgba(255,255,255,0.52);
+      background: rgba(255,255,255,.62);
       border: 1px solid var(--line);
       border-radius: 22px;
     }
 
     .section-title {
-      font-size: 0.78rem;
+      font-size: .78rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: .1em;
       color: var(--muted);
-      font-weight: 800;
+      font-weight: 850;
       margin-bottom: 10px;
     }
 
@@ -166,34 +177,19 @@
     }
 
     label {
-      font-size: 0.85rem;
+      font-size: .85rem;
       color: var(--muted);
-      font-weight: 700;
-    }
-
-    input, select {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--text);
-      border-radius: 15px;
-      padding: 11px 12px;
-      outline: none;
-    }
-
-    input:focus, select:focus {
-      border-color: rgba(155, 93, 229, 0.6);
-      box-shadow: 0 0 0 4px rgba(155, 93, 229, 0.12);
+      font-weight: 750;
     }
 
     .btn {
       width: 100%;
       padding: 12px 14px;
       border-radius: 16px;
-      font-weight: 850;
+      font-weight: 900;
       color: white;
-      background: linear-gradient(135deg, var(--brand), var(--brand-2));
-      box-shadow: 0 12px 28px rgba(155, 93, 229, 0.24);
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow: 0 12px 28px rgba(155, 93, 229, .24);
     }
 
     .btn.secondary {
@@ -204,16 +200,16 @@
     }
 
     .btn.soft {
-      background: rgba(155, 93, 229, 0.12);
+      background: rgba(155, 93, 229, .12);
       color: #6b36bd;
-      border: 1px solid rgba(155, 93, 229, 0.18);
+      border: 1px solid rgba(155, 93, 229, .18);
       box-shadow: none;
     }
 
-    .btn.danger-soft {
-      background: rgba(194, 65, 93, 0.08);
-      color: var(--bad);
-      border: 1px solid rgba(194, 65, 93, 0.13);
+    .btn.danger {
+      background: rgba(194, 65, 93, .1);
+      color: #a2334c;
+      border: 1px solid rgba(194, 65, 93, .17);
       box-shadow: none;
     }
 
@@ -227,7 +223,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.9rem;
+      font-size: .9rem;
       color: var(--muted);
       line-height: 1.35;
     }
@@ -237,18 +233,18 @@
       height: 10px;
       border-radius: 999px;
       background: #aaa;
-      box-shadow: 0 0 0 5px rgba(170, 170, 170, 0.12);
+      box-shadow: 0 0 0 5px rgba(170, 170, 170, .12);
       flex: 0 0 auto;
     }
 
     .dot.online {
       background: var(--good);
-      box-shadow: 0 0 0 5px rgba(46, 157, 98, 0.14);
+      box-shadow: 0 0 0 5px rgba(46, 157, 98, .14);
     }
 
     .dot.offline {
       background: var(--bad);
-      box-shadow: 0 0 0 5px rgba(194, 65, 93, 0.12);
+      box-shadow: 0 0 0 5px rgba(194, 65, 93, .12);
     }
 
     .share-box {
@@ -257,7 +253,7 @@
     }
 
     .share-box input {
-      font-size: 0.82rem;
+      font-size: .8rem;
       padding-inline: 10px;
     }
 
@@ -266,7 +262,30 @@
       border-radius: 14px;
       background: var(--text);
       color: white;
-      font-weight: 800;
+      font-weight: 850;
+    }
+
+    .tiny {
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.36;
+    }
+
+    .setup-alert {
+      border: 1px solid rgba(194, 65, 93, .16);
+      background: rgba(194, 65, 93, .06);
+      color: #7e2639;
+      border-radius: 18px;
+      padding: 11px;
+      font-size: .86rem;
+      line-height: 1.38;
+      display: none;
+    }
+
+    .setup-alert.show { display: block; }
+
+    .teacher-only.hidden {
+      display: none;
     }
 
     .top-bar {
@@ -276,7 +295,7 @@
       align-items: center;
       padding: 18px;
       border-radius: 24px;
-      background: rgba(255,255,255,0.62);
+      background: rgba(255,255,255,.64);
       border: 1px solid var(--line);
     }
 
@@ -288,10 +307,10 @@
       margin-top: 8px;
       padding: 7px 10px;
       border-radius: 999px;
-      background: rgba(155, 93, 229, 0.10);
+      background: rgba(155, 93, 229, .1);
       color: #6130a8;
-      font-size: 0.86rem;
-      font-weight: 800;
+      font-size: .86rem;
+      font-weight: 850;
     }
 
     .players {
@@ -299,6 +318,7 @@
       flex-wrap: wrap;
       gap: 8px;
       justify-content: flex-end;
+      max-width: 360px;
     }
 
     .player {
@@ -307,200 +327,223 @@
       background: #fff;
       border: 1px solid var(--line);
       color: var(--muted);
-      font-weight: 750;
-      font-size: 0.86rem;
+      font-weight: 760;
+      font-size: .86rem;
+    }
+
+    .player.teacher {
+      color: #6130a8;
+      background: rgba(155, 93, 229, .1);
+      border-color: rgba(155, 93, 229, .16);
     }
 
     .stage {
       flex: 1;
-      min-height: 390px;
+      min-height: 560px;
+      display: grid;
+      grid-template-columns: 1fr 290px;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .wheel-panel {
+      min-height: 520px;
+      border-radius: 30px;
+      background:
+        radial-gradient(circle at 30% 18%, rgba(254, 228, 64, .22), transparent 28%),
+        radial-gradient(circle at 72% 18%, rgba(0, 187, 249, .12), transparent 30%),
+        rgba(255,255,255,.6);
+      border: 1px solid var(--line);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      border-radius: 30px;
-      background:
-        radial-gradient(circle at 30% 15%, rgba(254, 228, 64, 0.28), transparent 25%),
-        radial-gradient(circle at 70% 15%, rgba(0, 187, 249, 0.12), transparent 26%),
-        rgba(255,255,255,0.55);
-      border: 1px solid var(--line);
-      position: relative;
       overflow: hidden;
+      position: relative;
       padding: 28px;
     }
 
-    .stage::before {
+    .wheel-wrap {
+      width: var(--wheel-size);
+      height: var(--wheel-size);
+      position: relative;
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 22px 35px rgba(58, 30, 70, .16));
+    }
+
+    .pointer {
+      position: absolute;
+      top: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      width: 0;
+      height: 0;
+      border-left: 22px solid transparent;
+      border-right: 22px solid transparent;
+      border-top: 42px solid #251726;
+      filter: drop-shadow(0 5px 0 rgba(0,0,0,.08));
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      position: relative;
+      overflow: hidden;
+      border: 12px solid #fff;
+      box-shadow:
+        inset 0 0 0 2px rgba(37, 23, 38, .1),
+        0 0 0 2px rgba(37, 23, 38, .1),
+        0 20px 44px rgba(75, 38, 95, .12);
+      transform: rotate(0deg);
+      background: conic-gradient(#9b5de5 0deg 60deg, #f15bb5 60deg 120deg, #00bbf9 120deg 180deg, #fee440 180deg 240deg, #00f5d4 240deg 300deg, #ff8fab 300deg 360deg);
+      transition: transform 5s cubic-bezier(.12,.78,.12,1);
+    }
+
+    .wheel::after {
       content: "";
       position: absolute;
-      inset: auto -10% -60% -10%;
-      height: 65%;
-      background: radial-gradient(ellipse at center, rgba(155,93,229,0.12), transparent 64%);
+      inset: 16%;
+      border-radius: 999px;
+      background: rgba(255,255,255,.9);
+      box-shadow: inset 0 0 0 1px rgba(37,23,38,.1);
+      z-index: 2;
+    }
+
+    .wheel-center {
+      position: absolute;
+      width: 92px;
+      height: 92px;
+      border-radius: 999px;
+      background: #fff;
+      border: 8px solid rgba(155, 93, 229, .18);
+      display: grid;
+      place-items: center;
+      z-index: 4;
+      color: #6b36bd;
+      font-weight: 950;
+      letter-spacing: -.03em;
+      box-shadow: 0 10px 26px rgba(75, 38, 95, .12);
       pointer-events: none;
     }
 
-    .dice-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: clamp(28px, 7vw, 74px);
-      perspective: 920px;
-      min-height: 210px;
-      width: 100%;
-      position: relative;
-      z-index: 2;
-    }
-
-    .dice-holder {
-      width: calc(var(--dice-size) + 20px);
-      height: calc(var(--dice-size) + 20px);
-      display: grid;
-      place-items: center;
-      position: relative;
-    }
-
-    .dice-holder.hidden {
-      display: none;
-    }
-
-    .dice {
-      width: var(--dice-size);
-      height: var(--dice-size);
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 1.25s cubic-bezier(.17,.84,.38,1.08);
-      filter: drop-shadow(0 24px 28px rgba(65, 33, 75, 0.24));
-    }
-
-    .face {
+    .wheel-labels {
       position: absolute;
-      width: var(--dice-size);
-      height: var(--dice-size);
-      border-radius: 24px;
-      background:
-        linear-gradient(145deg, rgba(255,255,255,1), rgba(245, 238, 250, 1));
-      border: 1px solid rgba(73, 42, 86, 0.13);
-      box-shadow:
-        inset 0 0 18px rgba(255,255,255,0.7),
-        inset 0 -10px 20px rgba(82, 48, 95, 0.08);
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      padding: 18px;
-      gap: 6px;
-      backface-visibility: hidden;
-    }
-
-    .pip {
-      width: 17px;
-      height: 17px;
+      inset: 0;
       border-radius: 999px;
-      background: linear-gradient(145deg, #3a233f, #1e1221);
-      align-self: center;
-      justify-self: center;
-      box-shadow: inset 0 2px 3px rgba(255,255,255,0.14);
+      z-index: 3;
+      pointer-events: none;
     }
 
-    .face.front  { transform: rotateY(0deg) translateZ(calc(var(--dice-size) / 2)); }
-    .face.back   { transform: rotateY(180deg) translateZ(calc(var(--dice-size) / 2)); }
-    .face.right  { transform: rotateY(90deg) translateZ(calc(var(--dice-size) / 2)); }
-    .face.left   { transform: rotateY(-90deg) translateZ(calc(var(--dice-size) / 2)); }
-    .face.top    { transform: rotateX(90deg) translateZ(calc(var(--dice-size) / 2)); }
-    .face.bottom { transform: rotateX(-90deg) translateZ(calc(var(--dice-size) / 2)); }
-
-    .result-row {
-      margin-top: 24px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      position: relative;
-      z-index: 2;
+    .wheel-label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 46%;
+      transform-origin: 0 50%;
+      font-weight: 900;
+      color: rgba(37, 23, 38, .86);
+      text-shadow: 0 1px 0 rgba(255,255,255,.55);
+      font-size: clamp(.68rem, 1.4vw, .9rem);
+      line-height: 1.05;
+      text-align: right;
+      padding-right: 18px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .result-card {
-      min-width: 86px;
-      padding: 12px 16px;
-      border-radius: 18px;
-      background: #fff;
-      border: 1px solid var(--line);
-      text-align: center;
-      box-shadow: 0 14px 34px rgba(75, 38, 95, 0.10);
-    }
-
-    .result-card small {
-      display: block;
-      color: var(--muted);
-      font-weight: 800;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 2px;
-    }
-
-    .result-card strong {
-      font-size: 1.85rem;
-      letter-spacing: -0.05em;
-    }
-
-    .big-roll {
-      position: relative;
-      z-index: 2;
-      margin-top: 26px;
+    .spin-btn {
+      margin-top: 28px;
       width: min(360px, 100%);
       padding: 17px 22px;
       border-radius: 999px;
-      font-size: 1.06rem;
+      font-size: 1.08rem;
       font-weight: 950;
-      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
       color: white;
-      box-shadow: 0 18px 42px rgba(155, 93, 229, 0.28);
+      box-shadow: 0 18px 42px rgba(155, 93, 229, .28);
     }
 
-    .message {
-      margin-top: 14px;
-      color: var(--muted);
-      text-align: center;
-      font-weight: 650;
-      min-height: 22px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .bottom-grid {
+    .result {
+      margin-top: 16px;
+      min-height: 58px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      min-height: 190px;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      font-weight: 760;
     }
 
-    .panel {
-      padding: 17px;
+    .result strong {
+      display: block;
+      color: var(--text);
+      font-size: 1.5rem;
+      letter-spacing: -.04em;
+      margin-top: 2px;
+    }
+
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .mini-card {
+      padding: 16px;
       border-radius: 24px;
-      background: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,.64);
       border: 1px solid var(--line);
-      overflow: hidden;
     }
 
-    .history {
-      max-height: 190px;
-      overflow: auto;
+    .item-list {
       display: flex;
       flex-direction: column;
       gap: 8px;
+      max-height: 240px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .item-pill {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px;
+      border-radius: 15px;
+      background: #fff;
+      border: 1px solid var(--line);
+      font-size: .88rem;
+      font-weight: 750;
+    }
+
+    .color-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      flex: 0 0 auto;
+    }
+
+    .history {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 230px;
+      overflow: auto;
       padding-right: 4px;
     }
 
     .history-item {
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: auto 1fr;
       gap: 10px;
-      align-items: center;
       padding: 10px;
       border: 1px solid var(--line);
       background: #fff;
       border-radius: 15px;
-      font-size: 0.88rem;
+      font-size: .88rem;
     }
 
     .badge {
@@ -509,120 +552,102 @@
       border-radius: 12px;
       display: grid;
       place-items: center;
-      background: rgba(155, 93, 229, 0.12);
+      background: rgba(155, 93, 229, .12);
       color: #6532b2;
       font-weight: 950;
     }
 
     .history-meta {
       color: var(--muted);
-      font-size: 0.78rem;
+      font-size: .78rem;
       margin-top: 2px;
     }
 
-    .sum {
-      font-weight: 950;
-      color: var(--text);
-    }
-
-    .rules {
-      color: var(--muted);
-      line-height: 1.52;
-      font-size: 0.93rem;
-    }
-
-    .rules strong {
-      color: var(--text);
-    }
-
-    .tiny {
-      color: var(--muted);
-      font-size: 0.78rem;
-      line-height: 1.35;
-    }
-
-    .setup-alert {
-      border: 1px solid rgba(194, 65, 93, 0.16);
-      background: rgba(194, 65, 93, 0.06);
-      color: #7e2639;
-      border-radius: 18px;
-      padding: 11px;
-      font-size: 0.86rem;
-      line-height: 1.38;
+    .name-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background:
+        radial-gradient(circle at top left, rgba(241, 91, 181, .25), transparent 36%),
+        radial-gradient(circle at top right, rgba(155, 93, 229, .25), transparent 34%),
+        rgba(255, 247, 251, .94);
       display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
     }
 
-    .setup-alert.show {
-      display: block;
+    .name-gate.show {
+      display: flex;
     }
 
-    .confetti {
-      position: absolute;
-      width: 9px;
-      height: 15px;
-      border-radius: 4px;
-      pointer-events: none;
-      opacity: 0.95;
-      animation: fall 900ms ease-out forwards;
-      z-index: 20;
+    .gate-card {
+      width: min(420px, 100%);
+      padding: 24px;
+      border-radius: 28px;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
     }
 
-    @keyframes fall {
-      from {
-        transform: translateY(-10px) rotate(0deg);
-        opacity: 1;
-      }
-      to {
-        transform: translateY(160px) rotate(260deg);
-        opacity: 0;
-      }
+    .gate-card h2 {
+      margin-bottom: 6px;
     }
 
-    @media (max-width: 900px) {
-      body {
-        padding: 14px;
-      }
+    .gate-card .field {
+      margin-top: 18px;
+    }
 
-      .app {
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 980px) {
+      body { padding: 14px; }
+      .app { grid-template-columns: 1fr; }
+      .sidebar, .main { min-height: auto; }
+      .stage { grid-template-columns: 1fr; min-height: auto; }
+      .wheel-panel { min-height: 500px; }
+      .players { justify-content: flex-start; max-width: none; }
+      .top-bar { grid-template-columns: 1fr; }
+      :root { --wheel-size: min(410px, 84vw); }
+    }
 
-      .sidebar, .main {
-        min-height: auto;
-      }
-
-      .bottom-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .top-bar {
-        grid-template-columns: 1fr;
-      }
-
-      .players {
-        justify-content: flex-start;
-      }
-
-      :root {
-        --dice-size: 96px;
+    @media (max-width: 520px) {
+      .wheel-panel { padding: 18px 10px; min-height: 450px; }
+      .wheel-center { width: 76px; height: 76px; font-size: .86rem; }
+      .pointer {
+        border-left-width: 17px;
+        border-right-width: 17px;
+        border-top-width: 34px;
       }
     }
   </style>
 </head>
 
 <body>
+  <div id="nameGate" class="name-gate">
+    <div class="gate-card">
+      <h2>Antes de entrar ✨</h2>
+      <p class="subtitle">Digite seu nome para a professora ver quem está na sala.</p>
+
+      <div class="field">
+        <label for="gateName">Seu nome</label>
+        <input id="gateName" type="text" maxlength="28" placeholder="Ex: Ana" />
+      </div>
+
+      <button id="enterAsStudentBtn" class="btn" type="button">Entrar na roleta</button>
+    </div>
+  </div>
+
   <div class="app">
     <aside class="sidebar card">
       <div class="brand-row">
         <div class="logo">HD</div>
         <div>
-          <h1>Help.Debs<br/>Dice Room</h1>
-          <p class="subtitle">Jogo de dados ao vivo</p>
+          <h1>Help.Debs<br/>Live Wheel</h1>
+          <p class="subtitle">Roleta ao vivo para aula</p>
         </div>
       </div>
 
       <div id="setupAlert" class="setup-alert">
-        Falta configurar o Supabase no código. Sem isso, o jogo funciona só neste computador, mas não sincroniza com a aluna.
+        Falta configurar o Supabase no código. Sem isso, a roleta funciona só neste computador, mas não sincroniza com a aluna.
       </div>
 
       <div class="section">
@@ -630,11 +655,11 @@
 
         <div class="field">
           <label for="playerName">Seu nome</label>
-          <input id="playerName" type="text" maxlength="24" placeholder="Teacher Débora" />
+          <input id="playerName" type="text" maxlength="28" placeholder="Teacher Débora" />
         </div>
 
         <div class="field">
-          <label for="playerRole">Quem é você?</label>
+          <label for="playerRole">Modo</label>
           <select id="playerRole">
             <option value="teacher">Professora</option>
             <option value="student">Aluna</option>
@@ -660,54 +685,54 @@
       </div>
 
       <div class="section">
-        <div class="section-title">Compartilhar</div>
+        <div class="section-title">Link da aluna</div>
         <div class="share-box">
-          <input id="shareLink" type="text" readonly placeholder="Entre em uma sala para gerar o link" />
+          <input id="shareLink" type="text" readonly placeholder="Crie uma sala para gerar o link" />
           <button id="copyLinkBtn" class="copy-btn" type="button">Copiar</button>
         </div>
         <p class="tiny" style="margin-top: 8px;">
-          Mande esse link para a aluna. Ela entra na mesma sala e vê as jogadas ao vivo.
+          Esse link abre como aluna e pede o nome antes de mostrar a roleta.
         </p>
       </div>
 
-      <div class="section">
-        <div class="section-title">Configuração do jogo</div>
+      <div class="section teacher-only" id="teacherControls">
+        <div class="section-title">Controle da professora</div>
 
         <div class="field">
-          <label for="diceCount">Quantidade de dados</label>
-          <select id="diceCount">
-            <option value="1">1 dado</option>
-            <option value="2">2 dados</option>
+          <label for="studentCanSpin">A aluna pode girar?</label>
+          <select id="studentCanSpin">
+            <option value="no">Não, só eu giro</option>
+            <option value="yes">Sim, ela também pode girar</option>
           </select>
         </div>
 
+        <button id="sendPermissionBtn" class="btn secondary" type="button">Atualizar permissão</button>
+      </div>
+
+      <div class="section teacher-only" id="editorPanel">
+        <div class="section-title">Editar itens da roleta</div>
+
         <div class="field">
-          <label for="rollPermission">Quem pode rolar?</label>
-          <select id="rollPermission">
-            <option value="both">Professora e aluna</option>
-            <option value="teacher">Só professora</option>
-          </select>
+          <label for="itemsText">Um item por linha</label>
+          <textarea id="itemsText" spellcheck="false"></textarea>
         </div>
 
-        <button id="sendSettingsBtn" class="btn secondary" type="button">Atualizar para a sala</button>
+        <div class="grid-2">
+          <button id="applyItemsBtn" class="btn" type="button">Aplicar</button>
+          <button id="resetItemsBtn" class="btn danger" type="button">Resetar</button>
+        </div>
+
         <p class="tiny" style="margin-top: 8px;">
-          Para controle real de acesso precisaria login. Aqui é controle visual para aula.
+          Você pode colocar quantos itens quiser. Para ficar legível, o ideal é usar textos curtos.
         </p>
       </div>
 
-      <div class="section">
-        <div class="section-title">Supabase</div>
-        <p class="tiny">
-          <br/><strong>https://pgdanuifukzisyyummpz.supabase.co/rest/v1/</strong> e <strong>sb_publishable_81NM6F08rsXXSCgjWl4iSg_v99cdVpo</strong>.
-        </p>
-      </div>
-    </aside>
 
     <main class="main card">
       <section class="top-bar">
         <div>
-          <h2>Roll the dice 🎲</h2>
-          <p class="subtitle">Use para escolher perguntas, desafios, casas do tabuleiro ou atividades.</p>
+          <h2>Spin the wheel 🎡</h2>
+          <p class="subtitle">Edite os itens, compartilhe o link e gire a mesma roleta com a aluna.</p>
           <div class="room-pill">Sala: <span id="roomLabel">nenhuma</span></div>
         </div>
 
@@ -716,52 +741,36 @@
         </div>
       </section>
 
-      <section class="stage" id="stage">
-        <div class="dice-wrap">
-          <div id="diceHolder1" class="dice-holder">
-            <div id="dice1" class="dice" aria-label="Dado 1"></div>
+      <section class="stage">
+        <div class="wheel-panel">
+          <div class="wheel-wrap">
+            <div class="pointer"></div>
+            <div id="wheel" class="wheel">
+              <div id="wheelLabels" class="wheel-labels"></div>
+            </div>
+            <div class="wheel-center">Help<br/>Debs</div>
           </div>
 
-          <div id="diceHolder2" class="dice-holder hidden">
-            <div id="dice2" class="dice" aria-label="Dado 2"></div>
+          <button id="spinBtn" class="spin-btn" type="button" disabled>Girar roleta</button>
+
+          <div id="result" class="result">
+            Entre em uma sala para começar.
           </div>
         </div>
 
-        <div class="result-row">
-          <div class="result-card">
-            <small>Dado 1</small>
-            <strong id="result1">-</strong>
+        <aside class="side-panel">
+          <div class="mini-card">
+            <div class="section-title">Itens atuais</div>
+            <div id="itemList" class="item-list"></div>
           </div>
-          <div id="resultCard2" class="result-card" style="display:none;">
-            <small>Dado 2</small>
-            <strong id="result2">-</strong>
-          </div>
-          <div class="result-card">
-            <small>Total</small>
-            <strong id="resultTotal">-</strong>
-          </div>
-        </div>
 
-        <button id="rollBtn" class="big-roll" type="button" disabled>Rolar dado</button>
-        <div id="message" class="message">Entre em uma sala para começar.</div>
-      </section>
-
-      <section class="bottom-grid">
-        <div class="panel">
-          <div class="section-title">Histórico</div>
-          <div id="history" class="history">
-            <p class="tiny">As jogadas vão aparecer aqui.</p>
+          <div class="mini-card">
+            <div class="section-title">Histórico</div>
+            <div id="history" class="history">
+              <p class="tiny">Os resultados vão aparecer aqui.</p>
+            </div>
           </div>
-        </div>
-
-        <div class="panel">
-          <div class="section-title">Ideias de uso na aula</div>
-          <p class="rules">
-            <strong>1 dado:</strong> cada número pode ser uma pergunta, tema ou desafio.<br/>
-            <strong>2 dados:</strong> use o total para avançar casas, escolher cards ou criar combinações.<br/>
-            <strong>Ao vivo:</strong> quando uma pessoa rola, a outra vê a animação e o mesmo resultado.
-          </p>
-        </div>
+        </aside>
       </section>
     </main>
   </div>
@@ -769,42 +778,38 @@
   <script>
     /**************************************************************
      * CONFIGURAÇÃO DO SUPABASE
-     * Cole aqui os dados do seu projeto:
-     *
-     * SUPABASE_URL: fica em Project Settings > API ou no botão Connect
-     * SUPABASE_KEY: use a Publishable key ou a anon public key
      **************************************************************/
-    const SUPABASE_URL = "COLE_AQUI_SUA_SUPABASE_URL";
-    const SUPABASE_KEY = "COLE_AQUI_SUA_SUPABASE_PUBLISHABLE_OU_ANON_KEY";
+    const SUPABASE_URL = "https://pgdanuifukzisyyummpz.supabase.co/rest/v1/";
+    const SUPABASE_KEY = "sb_publishable_81NM6F08rsXXSCgjWl4iSg_v99cdVpo";
 
-    const diceFaceHtml = {
-      1: `<span></span><span></span><span></span><span></span><i class="pip"></i><span></span><span></span><span></span><span></span>`,
-      2: `<i class="pip"></i><span></span><span></span><span></span><span></span><span></span><span></span><span></span><i class="pip"></i>`,
-      3: `<i class="pip"></i><span></span><span></span><span></span><i class="pip"></i><span></span><span></span><span></span><i class="pip"></i>`,
-      4: `<i class="pip"></i><span></span><i class="pip"></i><span></span><span></span><span></span><i class="pip"></i><span></span><i class="pip"></i>`,
-      5: `<i class="pip"></i><span></span><i class="pip"></i><span></span><i class="pip"></i><span></span><i class="pip"></i><span></span><i class="pip"></i>`,
-      6: `<i class="pip"></i><span></span><i class="pip"></i><i class="pip"></i><span></span><i class="pip"></i><i class="pip"></i><span></span><i class="pip"></i>`
-    };
-
-    const faceClasses = [
-      ["front", 1],
-      ["back", 6],
-      ["right", 3],
-      ["left", 4],
-      ["top", 2],
-      ["bottom", 5]
+    const defaultItems = [
+      "Question 1",
+      "Question 2",
+      "Vocabulary",
+      "Speaking",
+      "Challenge",
+      "Free talk"
     ];
 
-    const finalRotations = {
-      1: { x: 0, y: 0 },
-      2: { x: -90, y: 0 },
-      3: { x: 0, y: -90 },
-      4: { x: 0, y: 90 },
-      5: { x: 90, y: 0 },
-      6: { x: 0, y: 180 }
-    };
+    const palette = [
+      "#9b5de5",
+      "#f15bb5",
+      "#00bbf9",
+      "#fee440",
+      "#00f5d4",
+      "#ff8fab",
+      "#b8f2e6",
+      "#ffd166",
+      "#cdb4db",
+      "#a0c4ff",
+      "#ffc6ff",
+      "#fdffb6"
+    ];
 
     const els = {
+      nameGate: document.getElementById("nameGate"),
+      gateName: document.getElementById("gateName"),
+      enterAsStudentBtn: document.getElementById("enterAsStudentBtn"),
       setupAlert: document.getElementById("setupAlert"),
       playerName: document.getElementById("playerName"),
       playerRole: document.getElementById("playerRole"),
@@ -815,35 +820,36 @@
       statusText: document.getElementById("statusText"),
       shareLink: document.getElementById("shareLink"),
       copyLinkBtn: document.getElementById("copyLinkBtn"),
-      diceCount: document.getElementById("diceCount"),
-      rollPermission: document.getElementById("rollPermission"),
-      sendSettingsBtn: document.getElementById("sendSettingsBtn"),
+      teacherControls: document.getElementById("teacherControls"),
+      editorPanel: document.getElementById("editorPanel"),
+      studentCanSpin: document.getElementById("studentCanSpin"),
+      sendPermissionBtn: document.getElementById("sendPermissionBtn"),
+      itemsText: document.getElementById("itemsText"),
+      applyItemsBtn: document.getElementById("applyItemsBtn"),
+      resetItemsBtn: document.getElementById("resetItemsBtn"),
       roomLabel: document.getElementById("roomLabel"),
       players: document.getElementById("players"),
-      diceHolder1: document.getElementById("diceHolder1"),
-      diceHolder2: document.getElementById("diceHolder2"),
-      dice1: document.getElementById("dice1"),
-      dice2: document.getElementById("dice2"),
-      result1: document.getElementById("result1"),
-      result2: document.getElementById("result2"),
-      resultCard2: document.getElementById("resultCard2"),
-      resultTotal: document.getElementById("resultTotal"),
-      rollBtn: document.getElementById("rollBtn"),
-      message: document.getElementById("message"),
-      history: document.getElementById("history"),
-      stage: document.getElementById("stage")
+      wheel: document.getElementById("wheel"),
+      wheelLabels: document.getElementById("wheelLabels"),
+      itemList: document.getElementById("itemList"),
+      spinBtn: document.getElementById("spinBtn"),
+      result: document.getElementById("result"),
+      history: document.getElementById("history")
     };
 
     const clientId = crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
+
     let supabaseClient = null;
     let channel = null;
     let currentRoom = "";
     let isSubscribed = false;
-    let rollCounter = 0;
+    let isSpinning = false;
+    let currentRotation = 0;
+
     let currentState = {
-      diceCount: 1,
-      rollPermission: "both",
-      lastRoll: null,
+      items: [...defaultItems],
+      studentCanSpin: false,
+      lastSpin: null,
       history: []
     };
 
@@ -854,19 +860,6 @@
         !SUPABASE_URL.includes("COLE_AQUI") &&
         !SUPABASE_KEY.includes("COLE_AQUI")
       );
-    }
-
-    function initDice() {
-      [els.dice1, els.dice2].forEach((dice) => {
-        dice.innerHTML = "";
-        faceClasses.forEach(([className, value]) => {
-          const face = document.createElement("div");
-          face.className = "face " + className;
-          face.innerHTML = diceFaceHtml[value];
-          dice.appendChild(face);
-        });
-        dice.style.transform = "rotateX(-18deg) rotateY(24deg)";
-      });
     }
 
     function normalizeRoom(code) {
@@ -884,92 +877,6 @@
       return code;
     }
 
-    function savePrefs() {
-      localStorage.setItem("diceRoomName", els.playerName.value.trim());
-      localStorage.setItem("diceRoomRole", els.playerRole.value);
-    }
-
-    function loadPrefs() {
-      const params = new URLSearchParams(window.location.search);
-      const roomFromUrl = normalizeRoom(params.get("room"));
-      const name = localStorage.getItem("diceRoomName") || "Teacher Débora";
-      const role = localStorage.getItem("diceRoomRole") || "teacher";
-
-      els.playerName.value = name;
-      els.playerRole.value = role;
-
-      if (roomFromUrl) {
-        els.roomCode.value = roomFromUrl;
-      }
-    }
-
-    function setStatus(type, text) {
-      els.statusDot.className = "dot " + (type === "online" ? "online" : "offline");
-      els.statusText.textContent = text;
-    }
-
-    function setMessage(text) {
-      els.message.textContent = text;
-    }
-
-    function buildShareLink() {
-      if (!currentRoom) return "";
-      const url = new URL(window.location.href);
-      url.searchParams.set("room", currentRoom);
-      return url.toString();
-    }
-
-    function updateShareLink() {
-      els.shareLink.value = buildShareLink();
-    }
-
-    function updateRollButton() {
-      const role = els.playerRole.value;
-      const permission = currentState.rollPermission;
-      const allowed = isSubscribed && currentRoom && (permission === "both" || role === "teacher");
-      els.rollBtn.disabled = !allowed;
-
-      if (!currentRoom) {
-        setMessage("Entre em uma sala para começar.");
-      } else if (!isSubscribed && hasSupabaseConfig()) {
-        setMessage("Conectando à sala...");
-      } else if (permission === "teacher" && role !== "teacher") {
-        setMessage("Nesta rodada, só a professora pode rolar.");
-      } else if (!hasSupabaseConfig()) {
-        setMessage("Modo local: configure o Supabase para a aluna ver também.");
-      } else {
-        setMessage("Pronto. Clique para rolar.");
-      }
-    }
-
-    function updateDiceVisibility() {
-      const count = Number(currentState.diceCount || 1);
-      els.diceCount.value = String(count);
-      els.diceHolder2.classList.toggle("hidden", count !== 2);
-      els.resultCard2.style.display = count === 2 ? "" : "none";
-      els.rollBtn.textContent = count === 2 ? "Rolar dados" : "Rolar dado";
-    }
-
-    function updateSettingsUI() {
-      els.diceCount.value = String(currentState.diceCount || 1);
-      els.rollPermission.value = currentState.rollPermission || "both";
-      updateDiceVisibility();
-      updateRollButton();
-    }
-
-    function renderPlayers(presences) {
-      const values = Object.values(presences || {}).flat();
-      if (!values.length) {
-        els.players.innerHTML = `<span class="player">Ninguém online ainda</span>`;
-        return;
-      }
-
-      els.players.innerHTML = values
-        .slice(0, 8)
-        .map((p) => `<span class="player">${escapeHtml(p.name || "Participante")} ${p.role === "teacher" ? "👩‍🏫" : "✨"}</span>`)
-        .join("");
-    }
-
     function escapeHtml(value) {
       return String(value)
         .replaceAll("&", "&amp;")
@@ -979,109 +886,291 @@
         .replaceAll("'", "&#039;");
     }
 
-    function animateDie(diceEl, value, index = 0) {
-      const final = finalRotations[value] || finalRotations[1];
-      rollCounter++;
-      const spinX = 360 * (3 + ((rollCounter + index) % 3));
-      const spinY = 360 * (4 + ((rollCounter + index * 2) % 3));
-      const jitterX = index === 0 ? 0 : 360;
-      const transform = `rotateX(${spinX + jitterX + final.x}deg) rotateY(${spinY + final.y}deg)`;
-
-      diceEl.style.transition = "transform 1.25s cubic-bezier(.17,.84,.38,1.08)";
-      diceEl.style.transform = transform;
+    function getUrlParams() {
+      return new URLSearchParams(window.location.search);
     }
 
-    function applyRoll(roll, options = {}) {
-      const values = roll.values || [1];
-      const count = Number(roll.diceCount || values.length || 1);
+    function isStudentLink() {
+      return getUrlParams().get("role") === "student";
+    }
 
-      currentState.diceCount = count;
-      currentState.lastRoll = roll;
-      currentState.history = [roll, ...(currentState.history || [])].slice(0, 12);
+    function savePrefs() {
+      localStorage.setItem("wheelRoomName", els.playerName.value.trim());
+      localStorage.setItem("wheelRoomRole", els.playerRole.value);
+    }
 
-      updateSettingsUI();
+    function loadPrefs() {
+      const params = getUrlParams();
+      const roomFromUrl = normalizeRoom(params.get("room"));
+      const roleFromUrl = params.get("role");
 
-      animateDie(els.dice1, values[0], 0);
-      if (count === 2) {
-        animateDie(els.dice2, values[1] || 1, 1);
+      const savedName = localStorage.getItem("wheelRoomName");
+      const savedRole = localStorage.getItem("wheelRoomRole");
+
+      if (roomFromUrl) {
+        els.roomCode.value = roomFromUrl;
       }
 
-      setTimeout(() => {
-        els.result1.textContent = values[0] || "-";
-        els.result2.textContent = count === 2 ? (values[1] || "-") : "-";
-        els.resultTotal.textContent = values.reduce((acc, n) => acc + Number(n || 0), 0);
-        renderHistory();
-        if (!options.silent) popConfetti();
-      }, 930);
+      if (roleFromUrl === "student") {
+        els.playerRole.value = "student";
+        const previousStudentName = localStorage.getItem("wheelStudentName") || "";
+        if (previousStudentName) {
+          els.playerName.value = previousStudentName;
+          els.gateName.value = previousStudentName;
+        } else {
+          els.nameGate.classList.add("show");
+        }
+      } else {
+        els.playerRole.value = savedRole || "teacher";
+        els.playerName.value = savedName || "Teacher Débora";
+      }
 
-      const who = roll.rollerName || "Alguém";
-      setMessage(`${who} rolou: ${values.join(" + ")}.`);
+      updateModeUI();
+    }
+
+    function updateModeUI() {
+      const isTeacher = els.playerRole.value === "teacher";
+      els.teacherControls.classList.toggle("hidden", !isTeacher);
+      els.editorPanel.classList.toggle("hidden", !isTeacher);
+
+      if (isTeacher) {
+        els.playerName.placeholder = "Teacher Débora";
+      } else {
+        els.playerName.placeholder = "Nome da aluna";
+      }
+
+      updateSpinButton();
+    }
+
+    function setStatus(type, text) {
+      els.statusDot.className = "dot " + (type === "online" ? "online" : "offline");
+      els.statusText.textContent = text;
+    }
+
+    function setResultHtml(html) {
+      els.result.innerHTML = html;
+    }
+
+    function buildStudentShareLink() {
+      if (!currentRoom) return "";
+      const url = new URL(window.location.href);
+      url.searchParams.set("room", currentRoom);
+      url.searchParams.set("role", "student");
+      return url.toString();
+    }
+
+    function updateShareLink() {
+      els.shareLink.value = buildStudentShareLink();
+    }
+
+    function canCurrentUserSpin() {
+      const role = els.playerRole.value;
+      if (!currentRoom || !isSubscribed || isSpinning) return false;
+      if (role === "teacher") return true;
+      return currentState.studentCanSpin === true;
+    }
+
+    function updateSpinButton() {
+      els.spinBtn.disabled = !canCurrentUserSpin();
+
+      if (isSpinning) {
+        setResultHtml("Girando...");
+        return;
+      }
+
+      if (!currentRoom) {
+        setResultHtml("Entre em uma sala para começar.");
+        return;
+      }
+
+      if (els.playerRole.value === "student" && !currentState.studentCanSpin) {
+        setResultHtml("Aguardando a professora girar a roleta.");
+        return;
+      }
+
+      if (!hasSupabaseConfig()) {
+        setResultHtml("Modo local: configure o Supabase para sincronizar com a aluna.");
+        return;
+      }
+
+      setResultHtml("Pronto para girar.");
+    }
+
+    function getCleanItemsFromTextarea() {
+      return els.itemsText.value
+        .split("\n")
+        .map(item => item.trim())
+        .filter(Boolean)
+        .slice(0, 80);
+    }
+
+    function setItems(items) {
+      const clean = (items || [])
+        .map(item => String(item).trim())
+        .filter(Boolean)
+        .slice(0, 80);
+
+      currentState.items = clean.length ? clean : [...defaultItems];
+      els.itemsText.value = currentState.items.join("\n");
+      renderWheel();
+      renderItems();
+    }
+
+    function renderWheel() {
+      const items = currentState.items.length ? currentState.items : defaultItems;
+      const total = items.length;
+      const part = 360 / total;
+
+      const stops = items.map((_, i) => {
+        const color = palette[i % palette.length];
+        const start = i * part;
+        const end = (i + 1) * part;
+        return `${color} ${start}deg ${end}deg`;
+      });
+
+      els.wheel.style.background = `conic-gradient(${stops.join(",")})`;
+      els.wheelLabels.innerHTML = "";
+
+      items.forEach((item, i) => {
+        const angle = i * part + part / 2;
+        const label = document.createElement("div");
+        label.className = "wheel-label";
+        label.textContent = item;
+        label.style.transform = `rotate(${angle}deg) translateX(-8px)`;
+        label.style.color = readableTextColor(palette[i % palette.length]);
+        els.wheelLabels.appendChild(label);
+      });
+    }
+
+    function readableTextColor(hex) {
+      const clean = hex.replace("#", "");
+      const r = parseInt(clean.slice(0,2), 16);
+      const g = parseInt(clean.slice(2,4), 16);
+      const b = parseInt(clean.slice(4,6), 16);
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness > 168 ? "rgba(37, 23, 38, .9)" : "rgba(255,255,255,.96)";
+    }
+
+    function renderItems() {
+      const items = currentState.items || [];
+      els.itemList.innerHTML = items.map((item, i) => `
+        <div class="item-pill">
+          <span class="color-dot" style="background:${palette[i % palette.length]}"></span>
+          <span>${escapeHtml(item)}</span>
+        </div>
+      `).join("");
     }
 
     function renderHistory() {
       const list = currentState.history || [];
       if (!list.length) {
-        els.history.innerHTML = `<p class="tiny">As jogadas vão aparecer aqui.</p>`;
+        els.history.innerHTML = `<p class="tiny">Os resultados vão aparecer aqui.</p>`;
         return;
       }
 
-      els.history.innerHTML = list.map((item) => {
-        const values = item.values || [];
-        const total = values.reduce((acc, n) => acc + Number(n || 0), 0);
-        const time = item.time ? new Date(item.time).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "";
+      els.history.innerHTML = list.map((item, index) => {
+        const time = item.time
+          ? new Date(item.time).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+          : "";
+
         return `
           <div class="history-item">
-            <div class="badge">${values.length}</div>
+            <div class="badge">${index + 1}</div>
             <div>
-              <strong>${escapeHtml(item.rollerName || "Participante")}</strong>
-              <div class="history-meta">${values.join(" + ")} ${time ? "· " + time : ""}</div>
+              <strong>${escapeHtml(item.result || "")}</strong>
+              <div class="history-meta">${escapeHtml(item.spinnerName || "Participante")}${time ? " · " + time : ""}</div>
             </div>
-            <div class="sum">${total}</div>
           </div>
         `;
       }).join("");
     }
 
-    function popConfetti() {
-      const colors = ["#9b5de5", "#f15bb5", "#fee440", "#00bbf9", "#00f5d4"];
-      const rect = els.stage.getBoundingClientRect();
+    function renderPlayers(presences) {
+      const values = Object.values(presences || {}).flat();
 
-      for (let i = 0; i < 22; i++) {
-        const c = document.createElement("span");
-        c.className = "confetti";
-        c.style.left = (rect.width / 2 + (Math.random() * 220 - 110)) + "px";
-        c.style.top = (rect.height / 2 - 110 + Math.random() * 30) + "px";
-        c.style.background = colors[Math.floor(Math.random() * colors.length)];
-        c.style.animationDelay = (Math.random() * 180) + "ms";
-        els.stage.appendChild(c);
-        setTimeout(() => c.remove(), 1200);
+      if (!values.length) {
+        els.players.innerHTML = `<span class="player">Ninguém online ainda</span>`;
+        return;
       }
+
+      els.players.innerHTML = values
+        .slice(0, 10)
+        .map((p) => `
+          <span class="player ${p.role === "teacher" ? "teacher" : ""}">
+            ${escapeHtml(p.name || "Participante")} ${p.role === "teacher" ? "👩‍🏫" : "✨"}
+          </span>
+        `)
+        .join("");
     }
 
-    function buildRoll() {
-      const count = Number(currentState.diceCount || 1);
-      const values = Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1);
+    function calculateFinalRotation(index, total) {
+      const part = 360 / total;
+      const itemCenter = index * part + part / 2;
+
+      // Ponteiro fica em cima: 270 graus no sistema do conic-gradient.
+      const target = 270 - itemCenter;
+      const currentMod = ((currentRotation % 360) + 360) % 360;
+      const delta = ((target - currentMod) % 360 + 360) % 360;
+
+      const extraSpins = 6 + Math.floor(Math.random() * 3);
+      return currentRotation + extraSpins * 360 + delta;
+    }
+
+    function buildSpin() {
+      const items = currentState.items || defaultItems;
+      const index = Math.floor(Math.random() * items.length);
+      const result = items[index];
+      const finalRotation = calculateFinalRotation(index, items.length);
+
       return {
         id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
-        values,
-        diceCount: count,
-        rollerId: clientId,
-        rollerName: els.playerName.value.trim() || "Participante",
+        index,
+        result,
+        finalRotation,
+        itemsSnapshot: [...items],
+        spinnerId: clientId,
+        spinnerName: els.playerName.value.trim() || "Participante",
+        spinnerRole: els.playerRole.value,
         time: new Date().toISOString()
       };
     }
 
+    async function animateSpin(spin) {
+      isSpinning = true;
+      updateSpinButton();
+
+      if (spin.itemsSnapshot && spin.itemsSnapshot.length) {
+        setItems(spin.itemsSnapshot);
+      }
+
+      currentRotation = spin.finalRotation;
+      els.wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+      await new Promise(resolve => setTimeout(resolve, 5200));
+
+      currentState.lastSpin = spin;
+      currentState.history = [spin, ...(currentState.history || [])].slice(0, 12);
+
+      setResultHtml(`Resultado:<strong>${escapeHtml(spin.result)}</strong>`);
+      renderHistory();
+
+      isSpinning = false;
+      updateSpinButton();
+    }
+
+    async function applySpin(spin) {
+      if (!spin) return;
+      await animateSpin(spin);
+    }
+
     async function broadcast(event, payload) {
-      if (!channel || !isSubscribed) return;
+      if (!channel || !isSubscribed || !hasSupabaseConfig()) return;
+
       try {
-        await channel.send({
-          type: "broadcast",
-          event,
-          payload
-        });
+        await channel.send({ type: "broadcast", event, payload });
       } catch (error) {
         console.error(error);
-        setMessage("Não consegui enviar para a sala. Confira a conexão.");
+        setResultHtml("Não consegui enviar para a sala. Confira a conexão.");
       }
     }
 
@@ -1090,7 +1179,7 @@
 
       const normalized = normalizeRoom(room);
       if (!normalized) {
-        setMessage("Digite ou crie um código de sala.");
+        setResultHtml("Digite ou crie um código de sala.");
         return;
       }
 
@@ -1098,15 +1187,16 @@
       els.roomCode.value = normalized;
       els.roomLabel.textContent = normalized;
       updateShareLink();
+
       setStatus("offline", "Conectando...");
       isSubscribed = false;
-      updateRollButton();
+      updateSpinButton();
 
       if (!hasSupabaseConfig()) {
         els.setupAlert.classList.add("show");
         setStatus("offline", "Modo local");
         isSubscribed = true;
-        updateRollButton();
+        updateSpinButton();
         return;
       }
 
@@ -1121,8 +1211,7 @@
         channel = null;
       }
 
-      const channelName = `dice-room-${normalized}`;
-      channel = supabaseClient.channel(channelName, {
+      channel = supabaseClient.channel(`live-wheel-${normalized}`, {
         config: {
           broadcast: { self: false },
           presence: { key: clientId }
@@ -1130,35 +1219,56 @@
       });
 
       channel
-        .on("broadcast", { event: "dice_roll" }, ({ payload }) => {
-          if (!payload || payload.rollerId === clientId) return;
-          applyRoll(payload);
+        .on("broadcast", { event: "spin" }, ({ payload }) => {
+          if (!payload || payload.spinnerId === clientId) return;
+          applySpin(payload);
         })
-        .on("broadcast", { event: "settings" }, ({ payload }) => {
+        .on("broadcast", { event: "state" }, ({ payload }) => {
           if (!payload) return;
-          currentState.diceCount = Number(payload.diceCount || currentState.diceCount || 1);
-          currentState.rollPermission = payload.rollPermission || currentState.rollPermission || "both";
-          updateSettingsUI();
-          setMessage("Configuração atualizada para a sala.");
+          currentState = {
+            ...currentState,
+            ...payload,
+            items: payload.items || currentState.items || defaultItems,
+            history: payload.history || currentState.history || []
+          };
+          els.studentCanSpin.value = currentState.studentCanSpin ? "yes" : "no";
+          setItems(currentState.items);
+          renderHistory();
+          updateSpinButton();
         })
         .on("broadcast", { event: "state_request" }, ({ payload }) => {
           if (!payload || payload.requesterId === clientId) return;
-          broadcast("state_response", {
-            targetId: payload.requesterId,
-            state: currentState
-          });
+
+          if (els.playerRole.value === "teacher") {
+            broadcast("state_response", {
+              targetId: payload.requesterId,
+              state: currentState
+            });
+          }
         })
         .on("broadcast", { event: "state_response" }, ({ payload }) => {
           if (!payload || payload.targetId !== clientId || !payload.state) return;
+
           currentState = {
             ...currentState,
             ...payload.state,
+            items: payload.state.items || defaultItems,
             history: payload.state.history || []
           };
-          updateSettingsUI();
+
+          els.studentCanSpin.value = currentState.studentCanSpin ? "yes" : "no";
+          setItems(currentState.items);
           renderHistory();
-          if (currentState.lastRoll) {
-            applyRoll(currentState.lastRoll, { silent: true });
+          updateSpinButton();
+
+          if (currentState.lastSpin) {
+            currentRotation = currentState.lastSpin.finalRotation || 0;
+            els.wheel.style.transition = "none";
+            els.wheel.style.transform = `rotate(${currentRotation}deg)`;
+            requestAnimationFrame(() => {
+              els.wheel.style.transition = "transform 5s cubic-bezier(.12,.78,.12,1)";
+            });
+            setResultHtml(`Último resultado:<strong>${escapeHtml(currentState.lastSpin.result)}</strong>`);
           }
         })
         .on("presence", { event: "sync" }, () => {
@@ -1169,92 +1279,148 @@
         if (status === "SUBSCRIBED") {
           isSubscribed = true;
           setStatus("online", "Conectado ao vivo");
+
           await channel.track({
             id: clientId,
             name: els.playerName.value.trim() || "Participante",
             role: els.playerRole.value,
             joinedAt: new Date().toISOString()
           });
-          broadcast("state_request", { requesterId: clientId });
-          updateRollButton();
+
+          if (els.playerRole.value === "teacher") {
+            await broadcast("state", currentState);
+          } else {
+            await broadcast("state_request", { requesterId: clientId });
+          }
+
+          updateSpinButton();
         }
 
         if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
           isSubscribed = false;
           setStatus("offline", "Falha na conexão");
-          setMessage("Não conectou. Confira Supabase URL/key e internet.");
-          updateRollButton();
+          setResultHtml("Não conectou. Confira Supabase URL/key e internet.");
+          updateSpinButton();
         }
       });
     }
 
-    async function rollDice() {
-      savePrefs();
+    async function spinWheel() {
+      if (!canCurrentUserSpin()) return;
 
-      const role = els.playerRole.value;
-      if (currentState.rollPermission === "teacher" && role !== "teacher") {
-        setMessage("Nesta rodada, só a professora pode rolar.");
+      if (els.playerRole.value === "student" && !currentState.studentCanSpin) {
+        setResultHtml("A professora não liberou a roleta para a aluna girar.");
         return;
       }
 
-      const roll = buildRoll();
-      applyRoll(roll);
-      await broadcast("dice_roll", roll);
+      const spin = buildSpin();
+      await broadcast("spin", spin);
+      await applySpin(spin);
     }
 
-    async function sendSettings() {
-      currentState.diceCount = Number(els.diceCount.value || 1);
-      currentState.rollPermission = els.rollPermission.value || "both";
-      updateSettingsUI();
-      await broadcast("settings", {
-        diceCount: currentState.diceCount,
-        rollPermission: currentState.rollPermission
-      });
-      setMessage("Configuração enviada para a sala.");
+    async function applyItemsFromEditor() {
+      if (els.playerRole.value !== "teacher") return;
+
+      const items = getCleanItemsFromTextarea();
+      setItems(items);
+
+      currentState.lastSpin = null;
+      currentState.history = [];
+
+      renderHistory();
+      setResultHtml("Itens atualizados.");
+
+      await broadcast("state", currentState);
+    }
+
+    async function resetItems() {
+      if (els.playerRole.value !== "teacher") return;
+
+      setItems(defaultItems);
+      currentState.studentCanSpin = false;
+      currentState.lastSpin = null;
+      currentState.history = [];
+      els.studentCanSpin.value = "no";
+
+      renderHistory();
+      setResultHtml("Roleta resetada.");
+      await broadcast("state", currentState);
+    }
+
+    async function sendPermission() {
+      if (els.playerRole.value !== "teacher") return;
+
+      currentState.studentCanSpin = els.studentCanSpin.value === "yes";
+      updateSpinButton();
+      setResultHtml(currentState.studentCanSpin ? "Aluna liberada para girar." : "Só a professora pode girar.");
+      await broadcast("state", currentState);
     }
 
     async function copyLink() {
       const link = els.shareLink.value;
       if (!link) {
-        setMessage("Entre em uma sala para gerar o link.");
+        setResultHtml("Crie uma sala para gerar o link da aluna.");
         return;
       }
 
       try {
         await navigator.clipboard.writeText(link);
-        setMessage("Link copiado. Pode mandar para a aluna.");
+        setResultHtml("Link da aluna copiado.");
       } catch {
         els.shareLink.select();
         document.execCommand("copy");
-        setMessage("Link copiado.");
+        setResultHtml("Link da aluna copiado.");
       }
     }
 
+    function enterAsStudent() {
+      const name = els.gateName.value.trim();
+
+      if (!name) {
+        els.gateName.focus();
+        return;
+      }
+
+      localStorage.setItem("wheelStudentName", name);
+      localStorage.setItem("wheelRoomName", name);
+      localStorage.setItem("wheelRoomRole", "student");
+
+      els.playerName.value = name;
+      els.playerRole.value = "student";
+      els.nameGate.classList.remove("show");
+      updateModeUI();
+
+      if (els.roomCode.value) {
+        joinRoom(els.roomCode.value);
+      }
+    }
+
+    els.enterAsStudentBtn.addEventListener("click", enterAsStudent);
+
+    els.gateName.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") enterAsStudent();
+    });
+
     els.createRoomBtn.addEventListener("click", () => {
+      els.playerRole.value = "teacher";
+      els.playerName.value = els.playerName.value.trim() || "Teacher Débora";
+      updateModeUI();
+
       const code = randomRoomCode();
       els.roomCode.value = code;
       joinRoom(code);
     });
 
     els.joinRoomBtn.addEventListener("click", () => joinRoom(els.roomCode.value));
-    els.rollBtn.addEventListener("click", rollDice);
     els.copyLinkBtn.addEventListener("click", copyLink);
-    els.sendSettingsBtn.addEventListener("click", sendSettings);
+    els.spinBtn.addEventListener("click", spinWheel);
+    els.applyItemsBtn.addEventListener("click", applyItemsFromEditor);
+    els.resetItemsBtn.addEventListener("click", resetItems);
+    els.sendPermissionBtn.addEventListener("click", sendPermission);
 
-    els.diceCount.addEventListener("change", () => {
-      currentState.diceCount = Number(els.diceCount.value || 1);
-      updateDiceVisibility();
-    });
-
-    els.rollPermission.addEventListener("change", () => {
-      currentState.rollPermission = els.rollPermission.value || "both";
-      updateRollButton();
-    });
-
-    els.playerName.addEventListener("change", savePrefs);
-    els.playerRole.addEventListener("change", () => {
+    els.playerName.addEventListener("change", () => {
       savePrefs();
-      updateRollButton();
+
       if (channel && isSubscribed) {
         channel.track({
           id: clientId,
@@ -1265,17 +1431,37 @@
       }
     });
 
-    initDice();
+    els.playerRole.addEventListener("change", () => {
+      savePrefs();
+      updateModeUI();
+
+      if (channel && isSubscribed) {
+        channel.track({
+          id: clientId,
+          name: els.playerName.value.trim() || "Participante",
+          role: els.playerRole.value,
+          joinedAt: new Date().toISOString()
+        });
+      }
+    });
+
     loadPrefs();
-    updateSettingsUI();
+    setItems(defaultItems);
+    renderHistory();
 
     if (!hasSupabaseConfig()) {
       els.setupAlert.classList.add("show");
     }
 
+    if (isStudentLink() && !els.playerName.value.trim()) {
+      els.nameGate.classList.add("show");
+    }
+
     if (els.roomCode.value) {
-      joinRoom(els.roomCode.value);
+      if (!(isStudentLink() && els.nameGate.classList.contains("show"))) {
+        joinRoom(els.roomCode.value);
+      }
     }
   </script>
 </body>
-</html>
+</html> 
